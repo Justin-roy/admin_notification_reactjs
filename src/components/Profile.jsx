@@ -6,19 +6,23 @@ import Model from "../components/Model";
 function Profile() {
   const [showDialog, setShowDialog] = useState(false);
   const [userData, setUserData] = useState([]);
+  const [selectedToken, setSelectedToken] = useState(null);
 
-  const openDialog = () => {
+  const openDialog = (token) => {
+    setSelectedToken(token);
     setShowDialog(true);
   };
 
   const closeDialog = () => {
     setShowDialog(false);
+    setSelectedToken(null);
   };
 
   useEffect(() => {
     const getUserData = async () => {
       const users = await fetchData();
       if (users && users.length > 0) {
+        console.log(users);
         setUserData(users);
       }
     };
@@ -37,12 +41,11 @@ function Profile() {
           <img src={ErrorImg} alt="img" />
           <h3>{data.name || "No Name"}</h3>
           <p>Phone: {data.phone}</p>
-          <button onClick={openDialog}>Send Notification</button>
+          <button onClick={() => openDialog(data.fcm_token)}>
+            Send Notification
+          </button>
           {showDialog && (
-            <Model
-              onClose={closeDialog}
-              fcmToken={data.fcm_token || ""}
-            />
+            <Model onClose={closeDialog} fcmToken={selectedToken} />
           )}
         </div>
       ))}
